@@ -13,7 +13,7 @@ fail() {
 	exit 1
 }
 # SvelteKit rejects cross-site form posts, so send the Origin a browser would.
-req() { curl -sS -b "$JAR" -c "$JAR" -H "Origin: $B" "$@"; }
+req() { curl -sS -b "$JAR" -c "$JAR" -H "Origin: $B" -H "Accept: text/html" "$@"; }
 code() { local c; c=$(req -o "$TMP/last.body" -w "%{http_code}" "$@"); echo "$c" >"$TMP/last.code"; echo "$c"; }
 
 echo "Smoke testing $B"
