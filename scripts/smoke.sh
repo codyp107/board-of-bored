@@ -6,10 +6,15 @@ B="${1:-http://127.0.0.1:3000}"
 JAR=$(mktemp)
 TMP=$(mktemp -d)
 pass() { printf '  ok  %s\n' "$*"; }
-fail() { printf '  FAIL %s\n' "$*"; exit 1; }
+fail() {
+	printf '  FAIL %s (last HTTP status: %s)\n' "$*" "$(cat "$TMP/last.code" 2>/dev/null)"
+	head -c 1500 "$TMP/last.body" 2>/dev/null || true
+	echo
+	exit 1
+}
 # SvelteKit rejects cross-site form posts, so send the Origin a browser would.
 req() { curl -sS -b "$JAR" -c "$JAR" -H "Origin: $B" "$@"; }
-code() { req -o /dev/null -w '%{http_code}' "$@"; }
+code() { local c; c=$(req -o "$TMP/last.body" -w "%{http_code}" "$@"); echo "$c" >"$TMP/last.code"; echo "$c"; }
 
 echo "Smoke testing $B"
 for _ in $(seq 1 60); do curl -fsS "$B/healthz" >/dev/null 2>&1 && break; sleep 1; done
