@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install
+        run: if [ -f package-lock.json ]; then npm ci; else npm install; fi
+      - name: Type check
+        run: npm run check
+      - name: Tests
+        run: npm test
+      - name: Build
+        run: npm run build
+      - name: Smoke test the built server
+        run: |
+          DATA_DIR=$RUNNER_TEMP/data PORT=3000 node build &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:3000/healthz && break; sleep 1; done
+          # No account yet, so every page should redirect to the setup page.
+          test "$(curl -s -o /dev/null -w '%{redirect_url}' http://127.0.0.1:3000/w/all)" = "http://127.0.0.1:3000/setup"
+          curl -fsS http://127.0.0.1:3000/setup | grep -q "Create account"
+      - name: Upload lockfile
+        if: hashFiles('package-lock.json') == ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-lock
+          path: package-lock.json
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t board-of-bored:ci .

@@ -1,0 +1,16 @@
+services:
+  app:
+    build: .
+    image: board-of-bored:local
+    container_name: board-of-bored
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATA_DIR: /data
+      TZ: ${APP_TIMEZONE:-America/Denver}
+    ports:
+      # LAN only: the CT is not exposed to the internet; reach it remotely over your VPN.
+      - "${APP_PORT:-80}:3000"
+    volumes:
+      # Database (data/board.db) and attachments (data/attachments/) live here.
+      - ./data:/data
