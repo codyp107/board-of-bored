@@ -11,6 +11,20 @@ Workspaces: **Rise Internet**, **Pitcher Technologies**, **Home**, plus an **All
 
 ## Install on a Proxmox CT
 
+### Quickest: one command on the Proxmox host
+
+In the Proxmox web UI open *your node → Shell* and paste:
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/codyp107/board-of-bored/main/proxmox-create-ct.sh)"
+```
+
+It creates a Debian 12 CT (next free ID, 2 cores, 1 GB RAM, 8 GB disk, DHCP, nesting + keyctl on, starts on boot),
+asks for a root password for the CT console, then installs Board of Bored inside it and prints the URL.
+Overrides: `CTID=150 IP=192.168.1.50/24 GW=192.168.1.1 STORAGE=local-zfs bash -c "$(curl ...)"`.
+
+The manual route, if you prefer it:
+
 ### 1. Create the container (Proxmox web UI)
 
 - **Template:** Debian 12 (standard)
