@@ -116,7 +116,7 @@ It stops the app, moves the current data to `data.pre-restore-<time>` (nothing i
 Browsers only offer to install a PWA over HTTPS. Over plain `http://` the site works fully, and you can still
 use *Share → Add to Home Screen* on iPhone. For HTTPS, put a reverse proxy in front with a certificate for a
 name AdGuard resolves to the CT (e.g. Caddy or Nginx Proxy Manager with a DNS-challenge certificate for a subdomain
-of a domain you own). When behind a proxy, uncomment the `PROTOCOL_HEADER` / `HOST_HEADER` / `ADDRESS_HEADER` lines in `.env`.
+of a domain you own). `X-Forwarded-Proto` from the proxy is trusted automatically; uncomment `ADDRESS_HEADER` in `.env` so login rate limiting sees real client IPs.
 
 ---
 

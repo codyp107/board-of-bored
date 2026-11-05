@@ -23,7 +23,7 @@ jobs:
         run: npm run build
       - name: End-to-end smoke test
         run: |
-          DATA_DIR=$RUNNER_TEMP/data PORT=3000 node build > $RUNNER_TEMP/server.log 2>&1 &
+          DATA_DIR=$RUNNER_TEMP/data PORT=3000 node server.js > $RUNNER_TEMP/server.log 2>&1 &
           bash scripts/smoke.sh http://127.0.0.1:3000 || { cat $RUNNER_TEMP/server.log; exit 1; }
       - name: Upload lockfile
         uses: actions/upload-artifact@v4
